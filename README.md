@@ -1,2 +1,2 @@
 # react-pomodoro
-A pomodoro timer using React
+A pomodoro timer using React!
