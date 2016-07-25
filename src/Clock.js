@@ -1,3 +1,5 @@
+//Majority of project code & all state here
+
 import React, {Component} from 'react';
 import Options from './Options.js';
 import Timer from './Timer.js';
@@ -7,8 +9,11 @@ class Clock extends Component {
 		super(props);
 		this.state = {
 			time: 0,
-			started: false
+			started: true,
+			notifications: true
 		};
+
+		//binding all methods to correct context
 		this.tick = this.tick.bind(this);
 		this.handleSession = this.handleSession.bind(this);
 		this.handleReset = this.handleReset.bind(this);
@@ -17,18 +22,8 @@ class Clock extends Component {
 		this.setMainTimer = this.setTime.bind(this, 1500000);
 		this.setRestTimer = this.setTime.bind(this, 300000);
 		this.notificationSettings = this.notificationSettings.bind(this);
-	}
-
-	notificationSettings() {
-	  if (!("Notification" in window)) {
-	    this.setState({notifications: false});
-	  }	else if (Notification.permission === "granted") {
-	  	this.setState({notifications: true});
-	  } else if (Notification.permission !== 'denied') {
-	    Notification.requestPermission().then(function(result) {
-	      this.setState({notifications: result});
-	  	});
-		}
+		this.askPermission = this.askPermission.bind(this);
+		this.createNotification = this.createNotification.bind(this);
 	}
 
 	componentDidMount() {
@@ -36,6 +31,40 @@ class Clock extends Component {
 		this.notificationSettings();
 	}
 
+	//check user notification settings
+	notificationSettings() {
+	  if (!("Notification" in window)) {
+	    this.setState({notifications: false});
+	  }	else if (Notification.permission === "granted") {
+	  	this.setState({notifications: true});
+	  } else if (Notification.permission !== 'denied') {
+	  	this.askPermission();
+		}
+		console.log(Notification.permission);
+		console.log(this.state.notifications);
+	}
+
+	//called in notificationSettings method if user permission not set as granted and not denied
+	askPermission() {
+		Notification.requestPermission((permission) => {
+			if (permission === "granted") {
+			  this.setState({notifications: true});
+			} else {
+				this.setState({notifications: false});
+			}
+			console.log(this.state.notifications);
+		});	
+	}
+
+	//creates HTML5 notification for use in tick method
+	createNotification() {
+		var notification = new Notification("Time's up!", {
+			body: "Pomodoro update - time's up on your current counter!"
+		});
+		console.log("Notification should be showing...");
+	}
+
+	//method to format ms to minutes and seconds for display purposes
 	format(ms) {
 		let seconds = parseInt((ms/1000) % 60),
 				minutes = parseInt((ms/(1000*60)) % 60);
@@ -45,23 +74,18 @@ class Clock extends Component {
 		return minutes + ":" + seconds;
 	}
 
+	//called handleSession, checks if timer above 0 - if yes, reduces timer by 1 second
+	//if no, calls notification/alert based on user settings to confirm current timer finished
 	tick() {
-		if(this.state.time === 0) {
-			/*
-			TODO
-			Add alert sound
-			Correct notification behaviour
-
-			******
-			******
-			******
-
+		if(this.state.time <= 0) {
 			if(this.state.notifications === true) {
-				return new Notification("Time's up!");
+				this.createNotification();
+				clearInterval(this.interval);
 			} else {
 				alert("Time's up!");
+				clearInterval(this.interval);
 			}
-			*/
+			
 			clearInterval(this.interval);
 		} else {
 			this.setState({
@@ -70,11 +94,12 @@ class Clock extends Component {
 		}
 	}
 
+	//toggles if current timer is counting down
 	handleSession() {
 		this.setState({
 			started: !this.state.started
 		});
-		
+
 		if(this.state.started === true) {
 			this.interval = setInterval(this.tick, 1000);
 		} else {
@@ -82,14 +107,16 @@ class Clock extends Component {
 		}
 	}
 
+	//stops current countdown, resets timer amount
 	handleReset() {
 		clearInterval(this.interval);
 		this.setState({
 			started: !this.state.started,
-			time: 0
+			time: 1500000
 		});
 	}
 
+	//sets timer depending on user selection - times defined in bind calls at start of class
 	setTime(newTime) {
 		this.setState({
 			time: newTime,
@@ -97,16 +124,19 @@ class Clock extends Component {
 		});
 	}
 
+	//called on componentDidMount
 	setDefaultTime() {
 		this.setState({
 			time: 1500000
 		});
 	}
 
+	//adds 1 minute to timer
 	addMinute() {
 		this.setState({time: this.state.time + 60000})
 	}
 
+	//subtracts 1 minute from timer
 	minusMinute() {
 		if(this.state.time > 1) {
 			this.setState({time: this.state.time - 60000})
@@ -120,14 +150,10 @@ class Clock extends Component {
 	render() {
 		return(
 			<div className="container">
-				<div className="row">
-					<div className="col-md-3"></div>
-						<div className="col-md-6">
-							<Timer format={this.format} time={this.state.time} />
-						</div>
-					<div className="col-md-3"></div>
-				</div>
+			<div className="row">
+				<Timer format={this.format} time={this.state.time} />
 				<Options format={this.format} time={this.state.time} handleSession={this.handleSession} handleReset={this.handleReset} addMinute={this.addMinute} minusMinute={this.minusMinute} setMainTimer={this.setMainTimer} setRestTimer={this.setRestTimer} />
+			</div>
 			</div>
 		);
 	}

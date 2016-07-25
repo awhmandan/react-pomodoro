@@ -6,9 +6,37 @@ body {
 }
 
 .jumbotron {
-	height: 40vh;
+	height: 20vh;
 }
 
 hr {
 	border-top: 1px solid #FF530D;
+}
+
+.time-display {
+	font-size: 11em;
+	height: 30vh;
+	text-align: center;
+}
+
+.options {
+	height: 30vh;
+	text-align: center;
+}
+
+.no-decoration {
+	text-decoration: none;
+	text-align: center;
+	font-size: 3.5em;
+	cursor: pointer;
+}
+
+a:hover, a:visited, a:link, a:active {
+	text-decoration: none;
+}
+
+.btn {
+	margin-left: 0.45em;
+	margin-right: 0.45em;
+	text-align: center;
 }
