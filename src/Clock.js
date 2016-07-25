@@ -40,8 +40,6 @@ class Clock extends Component {
 	  } else if (Notification.permission !== 'denied') {
 	  	this.askPermission();
 		}
-		console.log(Notification.permission);
-		console.log(this.state.notifications);
 	}
 
 	//called in notificationSettings method if user permission not set as granted and not denied
@@ -52,8 +50,7 @@ class Clock extends Component {
 			} else {
 				this.setState({notifications: false});
 			}
-			console.log(this.state.notifications);
-		});	
+		});
 	}
 
 	//creates HTML5 notification for use in tick method
@@ -61,7 +58,6 @@ class Clock extends Component {
 		var notification = new Notification("Time's up!", {
 			body: "Pomodoro update - time's up on your current counter!"
 		});
-		console.log("Notification should be showing...");
 	}
 
 	//method to format ms to minutes and seconds for display purposes
@@ -80,6 +76,7 @@ class Clock extends Component {
 		if(this.state.time <= 0) {
 			if(this.state.notifications === true) {
 				this.createNotification();
+				alert("Time's up!");
 				clearInterval(this.interval);
 			} else {
 				alert("Time's up!");
