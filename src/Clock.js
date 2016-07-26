@@ -24,7 +24,7 @@ class Clock extends Component {
 		this.notificationSettings = this.notificationSettings.bind(this);
 		this.askPermission = this.askPermission.bind(this);
 		this.createNotification = this.createNotification.bind(this);
-		this.alert = this.alert.bind(this);
+		this.timerUpAlert = this.timerUpAlert.bind(this);
 	}
 
 	componentDidMount() {
@@ -76,7 +76,7 @@ class Clock extends Component {
 	//if no, calls notification/alert based on user settings to confirm current timer finished
 	tick() {
 		if(this.state.time === 0) {
-			this.alert();			
+			this.timerUpAlert();			
 		} else {
 			this.setState({
 				time: this.state.time - 1000
@@ -84,7 +84,7 @@ class Clock extends Component {
 		}
 	}
 
-	alert() {
+	timerUpAlert() {
 		if(this.state.notifications === true) {
 			this.createNotification();
 			clearInterval(this.interval);
