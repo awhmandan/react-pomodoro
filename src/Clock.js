@@ -24,6 +24,7 @@ class Clock extends Component {
 		this.notificationSettings = this.notificationSettings.bind(this);
 		this.askPermission = this.askPermission.bind(this);
 		this.createNotification = this.createNotification.bind(this);
+		this.alert = this.alert.bind(this);
 	}
 
 	componentDidMount() {
@@ -56,8 +57,9 @@ class Clock extends Component {
 	//creates HTML5 notification for use in tick method
 	createNotification() {
 		var notification = new Notification("Time's up!", {
-			body: "Pomodoro update - time's up on your current counter!"
+			body: "Pomodoro update - time's up on your current counter!",
 		});
+		setTimeout(notification.close.bind(notification), 5000);
 	}
 
 	//method to format ms to minutes and seconds for display purposes
@@ -73,21 +75,22 @@ class Clock extends Component {
 	//called handleSession, checks if timer above 0 - if yes, reduces timer by 1 second
 	//if no, calls notification/alert based on user settings to confirm current timer finished
 	tick() {
-		if(this.state.time <= 0) {
-			if(this.state.notifications === true) {
-				this.createNotification();
-				alert("Time's up!");
-				clearInterval(this.interval);
-			} else {
-				alert("Time's up!");
-				clearInterval(this.interval);
-			}
-			
-			clearInterval(this.interval);
+		if(this.state.time === 0) {
+			this.alert();			
 		} else {
 			this.setState({
 				time: this.state.time - 1000
 			});
+		}
+	}
+
+	alert() {
+		if(this.state.notifications === true) {
+			this.createNotification();
+			clearInterval(this.interval);
+		} else {
+			alert("Time's up!");
+			clearInterval(this.interval);
 		}
 	}
 
